@@ -1,5 +1,6 @@
 import Link from "next/link";
 import CardBox from "../shared/CardBox";
+import { Button } from "@/components/ui/button";
 
 export const RecentTransaction = () => {
   const timelineData = [
@@ -41,24 +42,18 @@ export const RecentTransaction = () => {
       desc: "New sale recorded",
       isSale: true,
       borderColor: "border-error",
-      isLastItem: false,
-    },
-    {
-      key: "timeline6",
-      time: "12:00 am",
-      desc: "Payment Done",
-      isSale: false,
-      borderColor: "border-success",
       isLastItem: true,
     },
   ];
   return (
     <CardBox className="h-full w-full">
-      <div className="flex flex-col">
-        <h5 className="card-title">Recent Transactions</h5>
-        <p className="text-sm text-muted-foreground font-normal">
-          How to secure recent transactions
-        </p>
+      <div className="flex flex-col justify-between mb-4">
+        <div>
+          <h5 className="card-title">Recent Transactions</h5>
+          <p className="text-sm text-muted-foreground font-normal">
+            How to secure recent transactions
+          </p>
+        </div>
       </div>
       <div className="mt-6">
         {timelineData.map((item) => {
@@ -82,7 +77,9 @@ export const RecentTransaction = () => {
               </div>
               <div className="w-1/4 grow pt-0.5 pb-6">
                 {!item.isSale ? (
-                  <p className="font-medium text-foreground dark:text-muted-foreground">{item.desc}</p>
+                  <p className="font-medium text-foreground dark:text-muted-foreground">
+                    {item.desc}
+                  </p>
                 ) : (
                   <div>
                     <h6>New sale recorded </h6>
@@ -95,6 +92,13 @@ export const RecentTransaction = () => {
             </div>
           );
         })}
+      </div>
+      <div className="mt-6 pt-4 border-t">
+        <Link href="/manage-wallet">
+          <Button variant="outline" className="w-full">
+            View All Transactions
+          </Button>
+        </Link>
       </div>
     </CardBox>
   );

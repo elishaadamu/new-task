@@ -1,22 +1,39 @@
-import Image from "next/image"
+"use client";
+import Image from "next/image";
+import { useAppContext } from "@/app/context/Appcontext";
 
 const ProfileWelcome = () => {
-    return (
-        <div className="relative flex items-center justify-between bg-lightsecondary rounded-lg p-6">
-            <div className="flex items-center gap-3">
-                <div>
-                    <Image src={"/images/profile/user-1.jpg"} alt="user-img" width={50} height={50} className="rounded-full" />
-                </div>
-                <div className="flex flex-col gap-0.5">
-                    <h5 className="card-title">Welcome back!  John 👋</h5>
-                    <p className="text-muted-foreground">Check your reports</p>
-                </div>
-            </div>
-            <div className="hidden sm:block absolute right-8 bottom-0">
-                <Image src={"/images/dashboard/customer-support-img.png"} alt="support-img" width={145} height={95} />
-            </div>
-        </div>
-    )
-}
+  const { userData } = useAppContext();
 
-export default ProfileWelcome
+  return (
+    <div className="relative flex items-center justify-between bg-lightsecondary rounded-lg p-6">
+      <div className="flex items-center gap-3">
+        <div>
+          <Image
+            src={"/images/profile/user-1.jpg"}
+            alt="user-img"
+            width={50}
+            height={50}
+            className="rounded-full"
+          />
+        </div>
+        <div className="flex flex-col gap-0.5">
+          <h5 className="card-title text-xl font-bold">
+            Welcome back! {userData?.firstName || "Admin"} 👋
+          </h5>
+          <p className="text-muted-foreground">Check your reports</p>
+        </div>
+      </div>
+      <div className="hidden sm:block absolute right-8 bottom-0">
+        <Image
+          src={"/images/dashboard/customer-support-img.png"}
+          alt="support-img"
+          width={145}
+          height={95}
+        />
+      </div>
+    </div>
+  );
+};
+
+export default ProfileWelcome;

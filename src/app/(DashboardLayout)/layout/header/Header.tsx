@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { Icon } from "@iconify/react";
 import Profile from "./Profile";
-import Notifications from "./Notifications";
 import SidebarLayout from "../sidebar/Sidebar";
 import FullLogo from "../shared/logo/FullLogo";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
@@ -67,7 +66,11 @@ const Header = () => {
             >
               <span className="flex items-center justify-center relative after:absolute after:w-10 after:h-10 after:rounded-full after:-top-1/2 group-hover:after:bg-lightprimary">
                 {theme === "light" ? (
-                  <Icon icon="tabler:moon" width="20" className="text-foreground dark:text-muted-foreground group-hover:text-primary dark:group-hover:text-primary" />
+                  <Icon
+                    icon="tabler:moon"
+                    width="20"
+                    className="text-foreground dark:text-muted-foreground group-hover:text-primary dark:group-hover:text-primary"
+                  />
                 ) : (
                   <Icon
                     icon="solar:sun-bold-duotone"
@@ -78,20 +81,13 @@ const Header = () => {
               </span>
             </div>
 
-            <div className="xl:block">
-              <div className="flex gap-0 items-center relative">
-                {/* Chat */}
-                <Notifications />
-              </div>
-            </div>
-
             {/* Profile Dropdown */}
             <Profile />
           </div>
 
           <div className="hidden xl:flex items-center justify-between w-full">
             <div className="flex items-center gap-2">
-              {/* Search Icon */}              
+              {/* Search Icon */}
               <div className="relative">
                 <Search />
               </div>
@@ -105,7 +101,11 @@ const Header = () => {
                 >
                   <span className="flex items-center justify-center relative after:absolute after:w-10 after:h-10 after:rounded-full after:-top-1/2 group-hover:after:bg-lightprimary">
                     {theme === "light" ? (
-                      <Icon icon="tabler:moon" width="20" className="text-foreground dark:text-muted-foreground group-hover:text-primary dark:group-hover:text-primary" />
+                      <Icon
+                        icon="tabler:moon"
+                        width="20"
+                        className="text-foreground dark:text-muted-foreground group-hover:text-primary dark:group-hover:text-primary"
+                      />
                     ) : (
                       <Icon
                         icon="solar:sun-bold-duotone"
@@ -114,13 +114,6 @@ const Header = () => {
                       />
                     )}
                   </span>
-                </div>
-
-                <div className="xl:block ">
-                  <div className="flex gap-0 items-center relative">
-                    {/* Chat */}
-                    <Notifications />
-                  </div>
                 </div>
 
                 {/* Profile Dropdown */}

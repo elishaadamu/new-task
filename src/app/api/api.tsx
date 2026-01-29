@@ -19,6 +19,17 @@ export const API_CONFIG = {
       UPDATE: "admin/tasks/", //APPEND {taskId}/status
       COMMENT: "admin/tasks/", //APPEND {taskId}/comment
     },
+    PROFILE: {
+      GET: "auth/profile",
+      UPDATE: "admin/users/", //APPEND {userId}
+    },
+    WALLET: {
+      CREDIT: "admin/wallet/credit",
+      DEBIT: "admin/wallet/debit",
+      GET_ALL_WALLETS: "admin/wallet/all",
+      GET_TRANSACTIONS: "admin/wallet/", //APPEND {userId}/transactions
+      GET_BALANCE: "admin/wallet/", //APPEND {userId}/balance
+    },
   },
 };
 

@@ -161,16 +161,21 @@ const SidebarLayout = ({ onClose }: { onClose?: () => void }) => {
             </div>
           ))}
         </div>
-
+        <hr className="my-5" />
         {/* Logout Button */}
-        <div className="mt-auto px-6 pb-10">
+        <div className="mt-auto px-3 ">
           <Button
             variant="ghost"
-            className="w-full justify-start gap-3 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+            className="w-full justify-start  text-white bg-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
             onClick={() => setShowLogoutDialog(true)}
           >
-            <Icon icon="solar:logout-2-linear" height={21} width={21} />
-            <span className="font-medium">Logout</span>
+            <Icon
+              className="font-bold"
+              icon="solar:logout-2-linear"
+              height={21}
+              width={21}
+            />
+            <span className="font-bold">Logout</span>
           </Button>
         </div>
       </SimpleBar>

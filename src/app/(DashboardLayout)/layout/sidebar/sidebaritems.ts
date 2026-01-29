@@ -50,18 +50,6 @@ const SidebarContent: MenuItem[] = [
     heading: "pages",
     children: [
       {
-        name: "Tables",
-        icon: "solar:server-linear",
-        id: uniqueId(),
-        url: "/utilities/table",
-      },
-      {
-        name: "Form",
-        icon: "solar:document-add-linear",
-        id: uniqueId(),
-        url: "/utilities/form",
-      },
-      {
         id: uniqueId(),
         name: "User Profile",
         icon: "solar:user-circle-linear",
@@ -82,46 +70,53 @@ const SidebarContent: MenuItem[] = [
         url: "/task",
         isPro: false,
       },
-    ],
-  },
-  {
-    heading: "Apps",
-    children: [
       {
         id: uniqueId(),
-        name: "Notes",
-        icon: "solar:notes-linear",
-        url: "/apps/notes",
+        name: "Manage Wallet",
+        icon: "solar:wallet-money-linear",
+        url: "/manage-wallet",
         isPro: false,
-      },
-      {
-        id: uniqueId(),
-        name: "Tickets",
-        icon: "solar:ticker-star-linear",
-        url: "/apps/tickets",
-        isPro: false,
-      },
-      {
-        name: "Blogs",
-        id: uniqueId(),
-        icon: "solar:sort-by-alphabet-linear",
-        children: [
-          {
-            id: uniqueId(),
-            name: "Blog Post",
-            url: "/apps/blog/post",
-            isPro: false,
-          },
-          {
-            id: uniqueId(),
-            name: "Blog Detail",
-            url: "/apps/blog/detail/streaming-video-way-before-it-was-cool-go-dark-tomorrow",
-            isPro: false,
-          },
-        ],
       },
     ],
   },
+  // {
+  //   heading: "Apps",
+  //   children: [
+  //     {
+  //       id: uniqueId(),
+  //       name: "Notes",
+  //       icon: "solar:notes-linear",
+  //       url: "/apps/notes",
+  //       isPro: false,
+  //     },
+  //     {
+  //       id: uniqueId(),
+  //       name: "Tickets",
+  //       icon: "solar:ticker-star-linear",
+  //       url: "/apps/tickets",
+  //       isPro: false,
+  //     },
+  //     {
+  //       name: "Blogs",
+  //       id: uniqueId(),
+  //       icon: "solar:sort-by-alphabet-linear",
+  //       children: [
+  //         {
+  //           id: uniqueId(),
+  //           name: "Blog Post",
+  //           url: "/apps/blog/post",
+  //           isPro: false,
+  //         },
+  //         {
+  //           id: uniqueId(),
+  //           name: "Blog Detail",
+  //           url: "/apps/blog/detail/streaming-video-way-before-it-was-cool-go-dark-tomorrow",
+  //           isPro: false,
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // },
   // {
   //   heading: "AI",
   //   children: [
