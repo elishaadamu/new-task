@@ -24,6 +24,7 @@ interface User {
   lastName: string;
   username: string;
   email: string;
+  role?: "USER" | "ADMIN" | string;
   status?: "ACTIVE" | "SUSPENDED" | string;
 }
 

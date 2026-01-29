@@ -13,7 +13,6 @@ import Search from "./Search";
 const Header = () => {
   const { theme, setTheme } = useTheme();
   const [isSticky, setIsSticky] = useState(false);
-  const [mobileMenu, setMobileMenu] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
