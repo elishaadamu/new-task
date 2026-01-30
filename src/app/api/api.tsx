@@ -30,6 +30,10 @@ export const API_CONFIG = {
       GET_TRANSACTIONS: "admin/wallet/", //APPEND {userId}/transactions
       GET_BALANCE: "admin/wallet/", //APPEND {userId}/balance
     },
+    STATISTICS: {
+      GET: "admin/stats",
+      GET_MONTHLY: "admin/stats/monthly-tasks",
+    },
   },
 };
 

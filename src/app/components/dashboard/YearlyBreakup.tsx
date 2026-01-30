@@ -1,106 +1,185 @@
-"use client"
+"use client";
+
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { Icon } from "@iconify/react/dist/iconify.js";
 import CardBox from "../shared/CardBox";
 import { ApexOptions } from "apexcharts";
+import { API_CONFIG, apiUrl } from "@/app/api/api";
+import axios from "axios";
+
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
-const YearlyBreakup = () => {
-
-    const ChartData: ApexOptions = {
-        series: [
-            38, 40, 25
-        ],
-        labels: ["2023", "2025", "2024"],
-        chart: {
-            type: "donut",
-            fontFamily: "inherit",
-            foreColor: "#adb0bb",
-            height: 200,
-            offsetX: 18,
-            toolbar: {
-                show: false,
-            },
-        },
-        plotOptions: {
-            pie: {
-                startAngle: 0,
-                endAngle: 360,
-                donut: {
-                    size: '75%',
-                },
-            },
-        },
-        stroke: {
-            show: false,
-        },
-
-        dataLabels: {
-            enabled: false,
-        },
-
-        legend: {
-            show: false,
-        },
-        colors: ["var(--color-primary)", "var(--color-lightprimary)", "var(--color-secondary)"],
-
-
-        tooltip: {
-            theme: "dark",
-            fillSeriesColor: false,
-            y: {
-                formatter: (val: number) => {
-                    return `$${val}K`;
-                }
-            }
-        },
-    };
-    return (
-        <>
-            <CardBox>
-                <div className="grid grid-cols-12 ">
-                    <div className="flex flex-col lg:col-span-6 md:col-span-6 col-span-7">
-                        <div>
-                            <h5 className="card-title mb-4 lg:whitespace-nowrap">Yearly Breakup</h5>
-                            <h4 className="text-xl mb-2">$36,358</h4>
-                            <div className="flex items-center mb-3 gap-2">
-                                <span className="rounded-full p-1 bg-lightsuccess dark:bg-darksuccess flex items-center justify-center ">
-                                    <Icon icon="tabler:arrow-up-left" className="text-success" />
-                                </span>
-                                <p className="text-muted-foreground mb-0">+9%</p>
-                                <p className="text-muted-foreground mb-0 ">last year</p>
-                            </div>
-                        </div>
-                        <div className="flex flex-wrap gap-4 items-center mt-4">
-                            <div className="flex items-center">
-                                <Icon icon="tabler:point-filled" className="text-primary text-xl me-1" />
-                                <span className="text-xs text-muted-foreground">2023</span>
-                            </div>
-                            <div className="flex items-center">
-                                <Icon icon="tabler:point-filled" className="text-secondary text-xl me-1" />
-                                <span className="text-xs text-muted-foreground">2024</span>
-                            </div>
-                            <div className="flex items-center">
-                                <Icon icon="tabler:point-filled" className="text-lightprimary text-xl me-1" />
-                                <span className="text-xs text-muted-foreground">2025</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="lg:col-span-6 md:col-span-6 col-span-4">
-                        <div className="flex justify-center">
-                            <Chart
-                                options={ChartData}
-                                series={ChartData.series}
-                                type="donut"
-                                height={200}
-                                width={180}
-                            />
-                        </div>
-                    </div>
-                </div>
-
-            </CardBox>
-        </>
-    )
+interface Task {
+  _id?: string;
+  id?: string;
+  title: string;
+  status: "PENDING" | "IN_PROGRESS" | "SUCCESS" | "FAILED";
+  createdAt?: string;
 }
-export { YearlyBreakup }
+
+const YearlyBreakup: React.FC = () => {
+  const [chartData, setChartData] = useState<{
+    series: number[];
+    options: ApexOptions;
+  }>({
+    series: [],
+    options: {},
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          apiUrl(API_CONFIG.ENDPOINTS.TASK.GET),
+          {
+            withCredentials: true,
+          },
+        );
+
+        const data = response.data;
+        let taskList: Task[] = [];
+
+        if (Array.isArray(data)) {
+          taskList = data;
+        } else if (data && data.tasks) {
+          const tasksPayload = data.tasks;
+          if (Array.isArray(tasksPayload)) {
+            taskList = tasksPayload;
+          } else {
+            const current = Array.isArray(tasksPayload.currentWeek)
+              ? tasksPayload.currentWeek
+              : [];
+            const previous = Array.isArray(tasksPayload.previousWeeks)
+              ? tasksPayload.previousWeeks
+              : [];
+            taskList = [...current, ...previous];
+          }
+        } else if (data) {
+          const current = Array.isArray(data.currentWeek)
+            ? data.currentWeek
+            : [];
+          const previous = Array.isArray(data.previousWeeks)
+            ? data.previousWeeks
+            : [];
+          taskList = [...current, ...previous];
+        }
+
+        // Calculate status counts for the chart
+        const statusCounts = {
+          PENDING: 0,
+          IN_PROGRESS: 0,
+          SUCCESS: 0,
+          FAILED: 0,
+        };
+
+        taskList.forEach((task) => {
+          if (task.status in statusCounts) {
+            statusCounts[task.status as keyof typeof statusCounts]++;
+          }
+        });
+
+        setChartData({
+          series: [
+            statusCounts.PENDING,
+            statusCounts.IN_PROGRESS,
+            statusCounts.SUCCESS,
+            statusCounts.FAILED,
+          ],
+          options: {
+            chart: {
+              type: "donut",
+              fontFamily: "inherit",
+              toolbar: { show: false },
+            },
+            labels: ["Pending", "In Progress", "Success", "Failed"],
+            colors: ["#EAB308", "#3B82F6", "#22C55E", "#EF4444"],
+            plotOptions: {
+              pie: {
+                donut: {
+                  size: "70%",
+                  labels: {
+                    show: true,
+                    total: {
+                      show: true,
+                      label: "Total Tasks",
+                      formatter: function (w) {
+                        return w.globals.seriesTotals
+                          .reduce((a: number, b: number) => a + b, 0)
+                          .toString();
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            dataLabels: {
+              enabled: false,
+            },
+            legend: {
+              show: true,
+              position: "bottom",
+              horizontalAlign: "center",
+              itemMargin: {
+                horizontal: 10,
+                vertical: 5,
+              },
+            },
+            stroke: {
+              show: false,
+            },
+            tooltip: {
+              theme: "dark",
+              y: {
+                formatter: function (val) {
+                  return val.toString();
+                },
+              },
+            },
+          },
+        });
+      } catch (error) {
+        console.error("Error fetching chart data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  return (
+    <CardBox className="pb-0 h-full w-full">
+      <div className="sm:flex items-center justify-between mb-6">
+        <div>
+          <h5 className="card-title">Task Status Overview</h5>
+          <p className="text-sm text-muted-foreground font-normal">
+            Distribution of Task Statuses
+          </p>
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div className="h-[316px] w-full flex items-center justify-center">
+          Loading...
+        </div>
+      ) : chartData.series.length > 0 ? (
+        <div className="flex justify-center items-center h-[316px]">
+          <Chart
+            options={chartData.options}
+            series={chartData.series}
+            type="donut"
+            height={300}
+            width="100%"
+          />
+        </div>
+      ) : (
+        <div className="h-[316px] w-full flex items-center justify-center">
+          No data available
+        </div>
+      )}
+    </CardBox>
+  );
+};
+
+export default YearlyBreakup;
