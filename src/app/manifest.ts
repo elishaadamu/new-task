@@ -1,16 +1,24 @@
-import type { MetadataRoute } from 'next';
+import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Tailwind Admin Dashboard',
-    short_name: 'TailwindAdmin',
-    start_url: '/',
-    display: 'standalone',
-    background_color: '#ffffff',
-    theme_color: '#5d87ff',
+    name: "AYDevelopers Admin Task Dashboard",
+    short_name: "AYDevelopers",
+    start_url: "/",
+    display: "standalone",
+    background_color: "#ffffff",
+    theme_color: "#5d87ff",
     icons: [
-      { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
-      { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+      {
+        src: "/images/logos/aydevelopers-BemNdjvJ.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        src: "/images/logos/aydevelopers-BemNdjvJ.png",
+        sizes: "512x512",
+        type: "image/png",
+      },
     ],
   };
 }

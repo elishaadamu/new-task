@@ -608,7 +608,6 @@ export default function UsersPage() {
 
               {/* Same form fields as create – just without password */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
-                {/* ... identical fields as above except password ... */}
                 <div className="grid gap-2">
                   <Label htmlFor="firstName">First Name</Label>
                   <Input
@@ -618,8 +617,119 @@ export default function UsersPage() {
                     required
                   />
                 </div>
-                {/* Repeat for lastName, email, username, phone, altPhone, state, lga, role, address */}
-                {/* ... omit password field in edit mode ... */}
+
+                <div className="grid gap-2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="username">Username</Label>
+                  <Input
+                    id="username"
+                    value={formData.username}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="altPhone">Alternative Phone</Label>
+                  <Input
+                    id="altPhone"
+                    type="tel"
+                    value={formData.altPhone}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="state">State</Label>
+                  <Select
+                    value={formData.state}
+                    onValueChange={(val) => {
+                      updateForm("state", val);
+                      updateForm("lga", "");
+                    }}
+                  >
+                    <SelectTrigger id="state" className="w-full">
+                      <SelectValue placeholder="Select state" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(statesData as StatesData).state.map((state) => (
+                        <SelectItem key={state} value={state}>
+                          {state}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="lga">LGA</Label>
+                  <Select
+                    value={formData.lga}
+                    onValueChange={(val) => updateForm("lga", val)}
+                    disabled={!formData.state}
+                  >
+                    <SelectTrigger id="lga" className="w-full">
+                      <SelectValue placeholder="Select LGA" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {formData.state &&
+                        (lgasData as LgasData)[formData.state]?.map((lga) => (
+                          <SelectItem key={lga} value={lga}>
+                            {lga}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="role">Role</Label>
+                  <Select
+                    value={formData.role}
+                    onValueChange={(val) =>
+                      updateForm("role", val as "USER" | "ADMIN")
+                    }
+                  >
+                    <SelectTrigger id="role">
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="USER">USER</SelectItem>
+                      <SelectItem value="ADMIN">ADMIN</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="grid gap-2 mb-4">

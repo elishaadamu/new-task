@@ -7,7 +7,7 @@ const FullLogo = () => {
     <>
       {/* Dark Logo */}
       <Image
-        src="/images/logos/dark-logo.svg"
+        src="/images/logos/aydevelopers-BemNdjvJ.png"
         alt="logo"
         width={204}
         height={36}
@@ -15,7 +15,7 @@ const FullLogo = () => {
       />
       {/* Light Logo */}
       <Image
-        src="/images/logos/light-logo.svg"
+        src="/images/logos/aydevelopers-BemNdjvJ.png"
         alt="logo"
         width={204}
         height={36}

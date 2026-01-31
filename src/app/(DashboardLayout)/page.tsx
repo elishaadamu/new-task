@@ -1,7 +1,5 @@
-import React from "react";
 import SalesOverview from "../components/dashboard/SalesOverview";
 import YearlyBreakup from "../components/dashboard/YearlyBreakup";
-import { MonthlyEarning } from "../components/dashboard/MonthlyEarning";
 import { Footer } from "../components/dashboard/Footer";
 import ProfileWelcome from "../components/dashboard/ProfileWelcome";
 import DashboardStats from "../components/dashboard/DashboardStats";
