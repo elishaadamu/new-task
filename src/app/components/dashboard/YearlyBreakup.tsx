@@ -103,6 +103,7 @@ const YearlyBreakup: React.FC = () => {
                     total: {
                       show: true,
                       label: "Total Tasks",
+                      color: "#FFFFFF",
                       formatter: function (w) {
                         return w.globals.seriesTotals
                           .reduce((a: number, b: number) => a + b, 0)
@@ -120,6 +121,9 @@ const YearlyBreakup: React.FC = () => {
               show: true,
               position: "bottom",
               horizontalAlign: "center",
+              labels: {
+                colors: "#FFFFFF",
+              },
               itemMargin: {
                 horizontal: 10,
                 vertical: 5,

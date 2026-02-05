@@ -14,7 +14,7 @@ export const API_CONFIG = {
     },
     TASK: {
       CREATE: "tasks",
-      GET: "tasks/my",
+      GET: "admin/tasks",
       DELETE: "admin/tasks/", //APPEND {taskId}
       UPDATE: "admin/tasks/", //APPEND {taskId}/status
       COMMENT: "admin/tasks/", //APPEND {taskId}/comment

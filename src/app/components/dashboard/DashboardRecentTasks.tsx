@@ -17,6 +17,14 @@ import { Icon } from "@iconify/react";
 import { API_CONFIG, apiUrl } from "@/app/api/api";
 import axios from "axios";
 import { CheckCircle2, Clock, PlayCircle, XCircle } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { isSameWeek } from "date-fns";
 
 interface Task {
   _id?: string;
@@ -36,47 +44,67 @@ const statusIcons: Record<string, React.ReactNode> = {
 export default function DashboardRecentTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<"current" | "previous">("current");
+  const [groupedTasks, setGroupedTasks] = useState<{
+    current: Task[];
+    previous: Task[];
+  }>({ current: [], previous: [] });
 
   useEffect(() => {
     fetchTasks();
   }, []);
+
+  useEffect(() => {
+    // Update displayed tasks when filter or groupedTasks changes
+    setTasks(groupedTasks[filter].slice(0, 5));
+  }, [filter, groupedTasks]);
 
   const fetchTasks = async () => {
     try {
       const response = await axios.get(apiUrl(API_CONFIG.ENDPOINTS.TASK.GET), {
         withCredentials: true,
       });
+      console.log(response.data);
 
       const data = response.data;
-      let taskList: Task[] = [];
+      let current: Task[] = [];
+      let previous: Task[] = [];
 
-      if (Array.isArray(data)) {
-        taskList = data;
-      } else if (data && data.tasks) {
-        const tasksPayload = data.tasks;
-        if (Array.isArray(tasksPayload)) {
-          taskList = tasksPayload;
-        } else {
-          const current = Array.isArray(tasksPayload.currentWeek)
-            ? tasksPayload.currentWeek
-            : [];
-          const previous = Array.isArray(tasksPayload.previousWeeks)
-            ? tasksPayload.previousWeeks
-            : [];
-          taskList = [...current, ...previous];
+      if (data && (data.currentWeek || data.previousWeeks)) {
+        // Handle pre-grouped data
+        current = Array.isArray(data.currentWeek) ? data.currentWeek : [];
+        previous = Array.isArray(data.previousWeeks) ? data.previousWeeks : [];
+      } else if (data && data.tasks && (data.tasks.currentWeek || data.tasks.previousWeeks)) {
+         // Handle nested pre-grouped data
+         current = Array.isArray(data.tasks.currentWeek) ? data.tasks.currentWeek : [];
+         previous = Array.isArray(data.tasks.previousWeeks) ? data.tasks.previousWeeks : [];
+      } else {
+        // Handle flat list - client side filtering
+        let allTasks: Task[] = [];
+        if (Array.isArray(data)) {
+          allTasks = data;
+        } else if (data && Array.isArray(data.tasks)) {
+          allTasks = data.tasks;
         }
-      } else if (data) {
-        const current = Array.isArray(data.currentWeek) ? data.currentWeek : [];
-        const previous = Array.isArray(data.previousWeeks)
-          ? data.previousWeeks
-          : [];
-        taskList = [...current, ...previous];
+
+        const now = new Date();
+        allTasks.forEach((task) => {
+          if (!task.createdAt) return;
+          const taskDate = new Date(task.createdAt);
+          if (isSameWeek(taskDate, now, { weekStartsOn: 1 })) {
+             current.push(task);
+          } else {
+             // You might want to be more specific here, e.g., isSameWeek(taskDate, subWeeks(now, 1))
+             // But "previousWeeks" implies everything before.
+             previous.push(task);
+          }
+        });
       }
 
-      setTasks(taskList.slice(0, 5));
+      setGroupedTasks({ current, previous });
     } catch (error) {
       console.error("Error fetching tasks:", error);
-      setTasks([]);
+      setGroupedTasks({ current: [], previous: [] });
     } finally {
       setLoading(false);
     }
@@ -94,14 +122,25 @@ export default function DashboardRecentTasks() {
             Recent Tasks
           </h5>
           <p className="text-sm text-muted-foreground font-normal">
-            Latest administrative tasks
+             {filter === "current" ? "Current Week" : "Previous Weeks"}
           </p>
         </div>
-        <Link href="/task">
-          <Button variant="outline" size="sm" className="whitespace-nowrap">
-            View All
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+            <Select value={filter} onValueChange={(val: "current" | "previous") => setFilter(val)}>
+            <SelectTrigger className="w-[140px] h-8">
+                <SelectValue placeholder="Select week" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectItem value="current">Current Week</SelectItem>
+                <SelectItem value="previous">Previous Week</SelectItem>
+            </SelectContent>
+            </Select>
+            <Link href="/task">
+            <Button variant="outline" size="sm" className="whitespace-nowrap h-8">
+                View All
+            </Button>
+            </Link>
+        </div>
       </div>
 
       <div className="overflow-x-auto">

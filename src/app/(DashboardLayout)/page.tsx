@@ -6,6 +6,7 @@ import DashboardStats from "../components/dashboard/DashboardStats";
 import DashboardRecentUsers from "../components/dashboard/DashboardRecentUsers";
 import DashboardRecentTasks from "../components/dashboard/DashboardRecentTasks";
 import DashboardRecentWallets from "../components/dashboard/DashboardRecentWallets";
+import TaskStatusTable from "../components/dashboard/TaskStatusTable";
 
 const page = () => {
   return (
@@ -18,7 +19,8 @@ const page = () => {
           <DashboardStats />
         </div>
         <div className="lg:col-span-8 col-span-12">
-          <SalesOverview />
+          {/* <SalesOverview /> */}
+          <TaskStatusTable />
         </div>
         <div className="lg:col-span-4 col-span-12">
           <div className="grid grid-cols-12 gap-6">

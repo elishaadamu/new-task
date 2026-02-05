@@ -50,19 +50,28 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { isSameWeek } from "date-fns";
 
 const TASKS_PER_PAGE = 10;
 
 export default function TaskPage() {
   const [tasks, setTasks] = useState<any[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // Removed isModalOpen and formData for create task
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [formData, setFormData] = useState({
-    title: "",
-    task: "",
-  });
+  const [filter, setFilter] = useState<"current" | "previous">("current");
+  const [groupedTasks, setGroupedTasks] = useState<{
+    current: any[];
+    previous: any[];
+  }>({ current: [], previous: [] });
 
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
   const [selectedTaskForComment, setSelectedTaskForComment] =
@@ -106,36 +115,39 @@ export default function TaskPage() {
       console.log(response.data);
       if (response.status === 200) {
         const data = response.data;
-        let taskList = [];
+        let current: any[] = [];
+        let previous: any[] = [];
 
-        if (Array.isArray(data)) {
-          taskList = data;
-        } else if (data && data.tasks) {
-          // Handle the structure: { success: true, tasks: { currentWeek: [], previousWeeks: [] } }
-          const tasksPayload = data.tasks;
-          if (Array.isArray(tasksPayload)) {
-            taskList = tasksPayload;
-          } else {
-            const current = Array.isArray(tasksPayload.currentWeek)
-              ? tasksPayload.currentWeek
-              : [];
-            const previous = Array.isArray(tasksPayload.previousWeeks)
-              ? tasksPayload.previousWeeks
-              : [];
-            taskList = [...current, ...previous];
+        if (data && (data.currentWeek || data.previousWeeks)) {
+          // Handle pre-grouped data
+          current = Array.isArray(data.currentWeek) ? data.currentWeek : [];
+          previous = Array.isArray(data.previousWeeks) ? data.previousWeeks : [];
+        } else if (data && data.tasks && (data.tasks.currentWeek || data.tasks.previousWeeks)) {
+           // Handle nested pre-grouped data
+           current = Array.isArray(data.tasks.currentWeek) ? data.tasks.currentWeek : [];
+           previous = Array.isArray(data.tasks.previousWeeks) ? data.tasks.previousWeeks : [];
+        } else {
+          // Handle flat list or flat tasks object
+          let allTasks: any[] = [];
+          if (Array.isArray(data)) {
+            allTasks = data;
+          } else if (data && Array.isArray(data.tasks)) {
+            allTasks = data.tasks;
           }
-        } else if (data) {
-          // Fallback for flat structure
-          const current = Array.isArray(data.currentWeek)
-            ? data.currentWeek
-            : [];
-          const previous = Array.isArray(data.previousWeeks)
-            ? data.previousWeeks
-            : [];
-          taskList = [...current, ...previous];
-        }
 
-        setTasks(taskList);
+          const now = new Date();
+          allTasks.forEach((task) => {
+            if (!task.createdAt) return;
+            const taskDate = new Date(task.createdAt);
+            if (isSameWeek(taskDate, now, { weekStartsOn: 1 })) {
+               current.push(task);
+            } else {
+               previous.push(task);
+            }
+          });
+        }
+        
+        setGroupedTasks({ current, previous });
       }
     } catch (error: any) {
       console.error("Error fetching tasks:", error);
@@ -148,48 +160,12 @@ export default function TaskPage() {
     fetchTasks();
   }, []);
 
-  const handleCreateTask = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const response = await axios.post(
-        apiUrl(API_CONFIG.ENDPOINTS.TASK.CREATE),
-        formData,
-        { withCredentials: true },
-      );
+  useEffect(() => {
+    setTasks(groupedTasks[filter]);
+    setCurrentPage(1); // Reset to first page when filter changes
+  }, [filter, groupedTasks]);
 
-      if (response.status === 200 || response.status === 201) {
-        showAlert(
-          "Success",
-          "Task created successfully!",
-          undefined,
-          "success",
-        );
-        setFormData({ title: "", task: "" });
-        setIsModalOpen(false);
-        fetchTasks();
-      }
-    } catch (error: any) {
-      console.error("Error creating task:", error);
-      showAlert(
-        "Error",
-        error.response?.data?.message || "Failed to create task",
-        undefined,
-        "danger",
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.id]: e.target.value,
-    });
-  };
+  // Removed handleCreateTask and handleChange
 
   const handleUpdateStatus = async (taskId: string, newStatus: string) => {
     try {
@@ -239,7 +215,11 @@ export default function TaskPage() {
               undefined,
               "success",
             );
-            setTasks((prev) => prev.filter((t) => (t._id || t.id) !== taskId));
+            // Optimistically update local state as well
+            setGroupedTasks(prev => ({
+                ...prev,
+                [filter]: prev[filter].filter((t: any) => (t._id || t.id) !== taskId)
+            }));
           }
         } catch (error: any) {
           console.error("Error deleting task:", error);
@@ -342,63 +322,21 @@ export default function TaskPage() {
             Task Management
           </h1>
           <p className="text-muted-foreground">
-            Create and track your administrative tasks.
+            {filter === "current" ? "Current Week Tasks" : "Previous Weeks Tasks"}
           </p>
         </div>
 
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogTrigger asChild>
-            <Button className="gap-2">
-              <Icon icon="solar:clipboard-add-linear" className="text-lg" />
-              Create Task
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-[330px] sm:max-w-[500px]">
-            <form onSubmit={handleCreateTask}>
-              <DialogHeader>
-                <DialogTitle>Add New Task</DialogTitle>
-                <DialogDescription>
-                  Enter the details of the task you want to post.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="title">Task Title</Label>
-                  <Input
-                    id="title"
-                    placeholder="e.g. Update User Roles"
-                    value={formData.title}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="task">Task Description</Label>
-                  <Textarea
-                    id="task"
-                    placeholder="Describe the task in detail..."
-                    value={formData.task}
-                    onChange={handleChange}
-                    required
-                    rows={4}
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button
-                  variant="outline"
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Posting..." : "Post Task"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+        <div className="flex items-center gap-2">
+            <Select value={filter} onValueChange={(val: "current" | "previous") => setFilter(val)}>
+            <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select week" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectItem value="current">Current Week</SelectItem>
+                <SelectItem value="previous">Previous Week</SelectItem>
+            </SelectContent>
+            </Select>
+        </div>
       </div>
 
       <div className="border rounded-lg bg-card overflow-hidden">
